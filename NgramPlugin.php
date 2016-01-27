@@ -35,13 +35,45 @@ SQL
     {
         $db = get_db();
         $db->query("DROP TABLE IF EXISTS `{$db->prefix}ngram_corpora`");
+
+        delete_option('ngram_text_element_id');
     }
 
     public function hookConfigForm()
-    {}
+    {
+        $db = get_db();
+        $select = $db->select()
+            ->from(
+                array('element_sets' => $db->ElementSet),
+                array('element_set_name' => 'element_sets.name')
+            )->join(
+                array('elements' => $db->Element),
+                'element_sets.id = elements.element_set_id',
+                array('element_id' =>'elements.id',
+                'element_name' => 'elements.name')
+            )->joinLeft(
+                array('item_types_elements' => $db->ItemTypesElements),
+                'elements.id = item_types_elements.element_id',
+                array()
+            )->where('element_sets.record_type IS NULL OR element_sets.record_type = "Item"')
+            ->order(array('element_sets.name', 'elements.name'));
+        $elements = $db->fetchAll($select);
 
-    public function hookConfig()
-    {}
+        $options = array('' => __('Select Below'));
+        foreach ($elements as $element) {
+            $optGroup = __($element['element_set_name']);
+            $value = __($element['element_name']);
+            $options[$optGroup][$element['element_id']] = $value;
+        }
+
+        $view = get_view();
+        include 'config_form.php';
+    }
+
+    public function hookConfig($args)
+    {
+        set_option('ngram_text_element_id', $args['post']['text_element_id']);
+    }
 
     public function hookDefineAcl($args)
     {

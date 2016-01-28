@@ -15,7 +15,7 @@ class NgramPlugin extends Omeka_Plugin_AbstractPlugin
     {
         $db = get_db();
         $db->query(<<<SQL
-CREATE TABLE IF NOT EXISTS `{$db->prefix}ngram_corpora` (
+CREATE TABLE IF NOT EXISTS `{$db->prefix}ngram_corpus` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `query` text COLLATE utf8_unicode_ci,
@@ -34,38 +34,14 @@ SQL
     public function hookUninstall()
     {
         $db = get_db();
-        $db->query("DROP TABLE IF EXISTS `{$db->prefix}ngram_corpora`");
+        $db->query("DROP TABLE IF EXISTS `{$db->prefix}ngram_corpus`");
 
         delete_option('ngram_text_element_id');
     }
 
     public function hookConfigForm()
     {
-        $db = get_db();
-        $select = $db->select()
-            ->from(
-                array('element_sets' => $db->ElementSet),
-                array('element_set_name' => 'element_sets.name')
-            )->join(
-                array('elements' => $db->Element),
-                'element_sets.id = elements.element_set_id',
-                array('element_id' =>'elements.id',
-                'element_name' => 'elements.name')
-            )->joinLeft(
-                array('item_types_elements' => $db->ItemTypesElements),
-                'elements.id = item_types_elements.element_id',
-                array()
-            )->where('element_sets.record_type IS NULL OR element_sets.record_type = "Item"')
-            ->order(array('element_sets.name', 'elements.name'));
-        $elements = $db->fetchAll($select);
-
-        $options = array('' => __('Select Below'));
-        foreach ($elements as $element) {
-            $optGroup = __($element['element_set_name']);
-            $value = __($element['element_name']);
-            $options[$optGroup][$element['element_id']] = $value;
-        }
-
+        $elementOptions = get_db()->getTable('NgramCorpus')->getElementsForSelect();
         $view = get_view();
         include 'config_form.php';
     }
@@ -84,7 +60,7 @@ SQL
     {
         $nav[] = array(
             'label' => __('Ngram'),
-            'uri' => url('ngram'),
+            'uri' => url('ngram/index'),
             'resource' => ('Ngram_Index'),
         );
         return $nav;

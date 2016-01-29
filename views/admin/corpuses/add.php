@@ -1,6 +1,5 @@
 <?php
-$pageTitle = __('Add Corpus');
-echo head(array('title' => $pageTitle, 'bodyclass' => 'add'));
+echo head(array('title' => 'Add Corpus', 'bodyclass' => 'add'));
 echo flash();
 ?>
 <form method="post">
@@ -23,42 +22,41 @@ echo flash();
     </div>
     <div class="field">
         <div class="two columns alpha">
-            <label for="sequence_member_element_id" class="required">Sequence Element</label>
+            <label for="sequence_element_id" class="required">Sequence Element</label>
         </div>
         <div class="inputs five columns omega">
             <?php echo $this->formSelect(
-                'sequence_member_element_id',
-                $corpus->sequence_member_element_id,
-                array('id' => 'sequence_member_element_id'),
+                'sequence_element_id',
+                $corpus->sequence_element_id,
+                array('id' => 'sequence_element_id'),
                 $elementOptions
             ); ?>
         </div>
     </div>
     <div class="field">
         <div class="two columns alpha">
-            <label for="sequence_member_pattern" class="required">Sequence Pattern</label>
+            <label for="sequence_type" class="required">Sequence Type</label>
         </div>
         <div class="inputs five columns omega">
             <?php echo $this->formSelect(
-                'sequence_member_pattern',
-                $corpus->sequence_member_pattern,
-                array('id' => 'sequence_member_pattern'),
+                'sequence_type',
+                $corpus->sequence_type,
+                array('id' => 'sequence_type'),
                 array(
                     '' => 'Select Below',
-                    '\d+' => '1 – n',
-                    '\d{4}' => 'YYYY',
-                    '\d{4}[1-]' => 'YYYYMM',
-                    '\d{8}' => 'YYYYMMDD',
+                    'year' => 'Date by year',
+                    'month' => 'Date by month',
+                    'day' => 'Date by day',
                 )
             ); ?>
         </div>
     </div>
     <div class="field">
         <div class="two columns alpha">
-            <label for="sequence_member_range">Sequence Range</label>
+            <label for="sequence_range">Sequence Range</label>
         </div>
         <div class="inputs five columns omega">
-            <?php echo $this->formText('sequence_member_range', $corpus->sequence_member_range); ?>
+            <?php echo $this->formText('sequence_range', $corpus->sequence_range); ?>
         </div>
     </div>
 </section>
@@ -68,3 +66,5 @@ echo flash();
     </div>
 </section>
 </form>
+
+<?php echo foot(); ?>

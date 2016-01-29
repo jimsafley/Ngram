@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `{$db->prefix}ngram_corpus` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `query` text COLLATE utf8_unicode_ci,
   `text_element_id` int(10) unsigned NOT NULL,
-  `sequence_member_element_id` int(10) unsigned NOT NULL,
-  `sequence_member_pattern` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `sequence_member_range` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sequence_element_id` int(10) unsigned NOT NULL,
+  `sequence_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `sequence_range` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `valid_items` text COLLATE utf8_unicode_ci,
   `invalid_items` text COLLATE utf8_unicode_ci,
   PRIMARY KEY (`id`)

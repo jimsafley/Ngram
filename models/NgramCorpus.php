@@ -5,9 +5,9 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
     public $name;
     public $query;
     public $text_element_id;
-    public $sequence_member_element_id;
-    public $sequence_member_pattern;
-    public $sequence_member_range;
+    public $sequence_element_id;
+    public $sequence_type;
+    public $sequence_range;
     public $valid_items;
     public $invalid_items;
 
@@ -16,9 +16,9 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         return $this->getTable('Element')->find($this->text_element_id);
     }
 
-    public function getSequenceMemberElementId()
+    public function getSequenceElement()
     {
-        return $this->getTable('Element')->find($this->sequence_member_element_id);
+        return $this->getTable('Element')->find($this->sequence_element_id);
     }
 
     public function getValidItems()
@@ -53,12 +53,8 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
             $this->addError('name', 'A name is required');
         }
         $elementId = $this->sequence_member_element_id;
-        if (!$db->getTable('Element')->exists($this->sequence_member_element_id)) {
+        if (!$db->getTable('Element')->exists($this->sequence_element_id)) {
             $this->addError('Sequence Element', 'An element is required');
-        }
-        $pattern = trim($this->sequence_member_pattern);
-        if ('' === $pattern) {
-            $this->addError('Sequence Pattern', 'A pattern is required');
         }
     }
 }

@@ -1,6 +1,5 @@
 <?php
-$pageTitle = __('Browse Corpora');
-echo head(array('title' => $pageTitle, 'bodyclass' => 'browse'));
+echo head(array('title' => 'Browse Corpora', 'bodyclass' => 'browse'));
 echo flash();
 ?>
 
@@ -26,11 +25,14 @@ echo flash();
     <tr>
         <td><?php echo link_to($corpus, 'show', $corpus->name);?></td>
         <td><?php echo $corpus->getTextElement()->name; ?></td>
-        <td><?php echo $corpus->getSequenceMemberElementId()->name; ?></td>
+        <td><?php echo $corpus->getSequenceElement()->name; ?></td>
         <td><?php echo count($corpus->getValidItems()); ?></td>
         <td><?php echo count($corpus->getInvalidItems()); ?></td>
         <td>
-            <button>Validate Items</button>
+            <form method="post" action="<?php echo html_escape(url('ngram/corpuses/validate-items')); ?>">
+                <?php echo $this->formHidden('id', $corpus->id); ?>
+                <?php echo $this->formSubmit('validate_items', 'Validate Items'); ?>
+            </form>
             <?php if ($corpus->canGenerateCorpusNgrams()): ?>
             <button>Generate Corpus Ngrams</button>
             <?php endif; ?>

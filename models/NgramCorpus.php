@@ -8,8 +8,7 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
     public $sequence_element_id;
     public $sequence_type;
     public $sequence_range;
-    public $valid_items;
-    public $invalid_items;
+    public $items;
 
     public function getTextElement()
     {
@@ -21,14 +20,9 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         return $this->getTable('Element')->find($this->sequence_element_id);
     }
 
-    public function getValidItems()
+    public function getItems()
     {
-        return json_decode($this->valid_items, true);
-    }
-
-    public function getInvalidItems()
-    {
-        return json_decode($this->invalid_items, true);
+        return json_decode($this->items, true);
     }
 
     public function getRecordUrl($action = 'show')
@@ -36,14 +30,9 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         return array('controller' => 'ngram', 'action' => $action, 'id' => $this->id);
     }
 
-    public function canValidateItems()
-    {
-        // corpus ngrams have not yet been generated / process is not running
-    }
-
     public function canGenerateCorpusNgrams()
     {
-        // all items in $this->valid_items are in the item_ngrams table
+        // all items in $this->items are in the item_ngrams table
     }
 
     protected function _validate() {

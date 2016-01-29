@@ -15,8 +15,8 @@ echo flash();
         <th>Name</th>
         <th>Text Element</th>
         <th>Sequence Element</th>
-        <th>Valid Items</th>
-        <th>Invalid Items</th>
+        <th>Sequence Type</th>
+        <th>Sequence Range</th>
         <th></th>
     </tr>
 </thead>
@@ -26,8 +26,8 @@ echo flash();
         <td><?php echo link_to($corpus, 'show', $corpus->name);?></td>
         <td><?php echo $corpus->getTextElement()->name; ?></td>
         <td><?php echo $corpus->getSequenceElement()->name; ?></td>
-        <td><?php echo count($corpus->getValidItems()); ?></td>
-        <td><?php echo count($corpus->getInvalidItems()); ?></td>
+        <td><?php echo $corpus->sequence_type; ?></td>
+        <td><?php echo $corpus->sequence_range; ?></td>
         <td>
             <form method="post" action="<?php echo html_escape(url('ngram/corpuses/validate-items')); ?>">
                 <?php echo $this->formHidden('id', $corpus->id); ?>

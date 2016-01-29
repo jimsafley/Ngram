@@ -1,8 +1,12 @@
-<?php echo head(array('title' => 'Validate Corpus Items')); ?>
+<?php
+echo head(array('title' => 'Validate Corpus Items'));
+$validCount = count($validItems);
+$invalidCount = count($invalidItems);
+?>
 
-<h2><?php echo $corpus->name; ?></h2>
+<h2><?php echo $corpus->name; ?> (<?php echo $validCount + $invalidCount ?> total items)</h2>
 
-<h3>Invalid Items</h3>
+<h3>Invalid Items (<?php echo $invalidCount; ?>)</h3>
 
 <table>
 <thead>
@@ -21,7 +25,7 @@
 </tbody>
 </table>
 
-<h3>Valid Items</h3>
+<h3>Valid Items (<?php echo $validCount; ?>)</h3>
 
 <table>
 <thead>

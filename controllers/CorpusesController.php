@@ -8,56 +8,72 @@ class Ngram_CorpusesController extends Omeka_Controller_AbstractActionController
 
     public function addAction()
     {
-        $db = $this->_helper->db;
         if ($this->getRequest()->isPost()) {
             $this->getRequest()->setPost('text_element_id', get_option('ngram_text_element_id'));
         }
-        $this->view->elementOptions = $db->getTable('NgramCorpus')->getElementsForSelect();
         parent::addAction();
+
+        $table = $this->_helper->db;
+        $this->view->elementOptions = $table->getTable('NgramCorpus')->getElementsForSelect();
         $this->view->corpus = $this->view->ngram_corpu; // correct poor inflection
+    }
+
+    /**
+     * Set items in corpus.
+     *
+     * @param Omeka_Record_AbstractRecord $corpus
+     */
+    protected function _redirectAfterAdd($corpus)
+    {
+        parse_str($corpus->query, $query);
+        // Items must be described by the corpus sequence element.
+        $query['advanced'][] = array(
+            'element_id' => $corpus->sequence_element_id,
+            'type' => 'is not empty',
+        );
+        // Items must be described by the corpus text element.
+        $query['advanced'][] = array(
+            'element_id' => $corpus->text_element_id,
+            'type' => 'is not empty',
+        );
+
+        $table = $this->_helper->db;
+        $items = $table->getTable('Item')->findBy($query);
+        $itemIds = array();
+        foreach ($items as $item) {
+            $itemIds[] = $item->id;
+        }
+
+        $corpus->items = json_encode($itemIds);
+        $corpus->save(false);
+
+        parent::_redirectAfterAdd($corpus);
     }
 
     public function validateItemsAction()
     {
         $table = $this->_helper->db;
-
-        $corpus = $table->findById();
-        $sequenceElement = $corpus->getSequenceElement();
-        $textElement = $corpus->getTextElement();
-
-        // Find items by corpus query, if any.
-        $query = $corpus->query ? parse_str($corpus->query) : array();
-        // Items must be described by the corpus sequence element.
-        $query['advanced'][] = array(
-            'element_id' => $sequenceElement->id,
-            'type' => 'is not empty',
-        );
-        // Items must be described by the corpus text element.
-        $query['advanced'][] = array(
-            'element_id' => $textElement->id,
-            'type' => 'is not empty',
-        );
-        $items = $table->getTable('Item')->findBy($query);
-
-        $corpusItemIds = array();
-        foreach ($items as $item) {
-            $corpusItemIds[] = $item->id;
-        }
-
         $db = $table->getDb();
-        $sequenceElementId = $db->quote($sequenceElement->id);
-        $corpusItemIds = $db->quote($corpusItemIds);
-        $sql = <<<SQL
-SELECT i.id, et.text
-FROM {$db->Item} i
-JOIN {$db->ElementText} et
-ON i.id = et.record_id
-WHERE i.id IN ($corpusItemIds)
-AND et.element_id = $sequenceElementId
-GROUP BY i.id
-SQL;
+        $corpus = $table->find($this->getParam('id'));
 
+        // Query the database directly to get sequence element text. This
+        // reduces the overhead that would otherwise be required to cache all
+        // element texts.
+
+        $sql = sprintf(
+        'SELECT i.id, et.text
+        FROM %s i JOIN %s et
+        ON i.id = et.record_id
+        WHERE i.id IN (%s)
+        AND et.element_id = %s
+        GROUP BY i.id',
+        $db->Item,
+        $db->ElementText,
+        $db->quote(json_decode($corpus->items, true)),
+        $db->quote($corpus->sequence_element_id));
         $items = $db->fetchAll($sql);
+
+        // Validate the sequence text.
         $validItems = array();
         $invalidItems = array();
         foreach ($items as $item) {
@@ -142,6 +158,7 @@ SQL;
             }
         }
 
+        // Sort the valid and invalid item arrays.
         usort($validItems, function($a, $b) {
             if ($a['sequence_member'] === $b['sequence_member']) {
                 return 0;

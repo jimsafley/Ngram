@@ -4,25 +4,55 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
     public $id;
     public $name;
     public $query;
-    public $text_element_id;
     public $sequence_element_id;
     public $sequence_type;
     public $sequence_range;
     public $items;
 
-    public function getTextElement()
-    {
-        return $this->getTable('Element')->find($this->text_element_id);
-    }
+    protected $_related = array(
+        'SequenceElement' => 'getSequenceElement',
+        'SequenceType' => 'getSequenceType',
+        'Items' => 'getItems',
+    );
 
+    /**
+     * Get the element containing sequence text.
+     *
+     * @return Element
+     */
     public function getSequenceElement()
     {
         return $this->getTable('Element')->find($this->sequence_element_id);
     }
 
+    /**
+     * Get sequence type object.
+     *
+     * @return Ngram_SequenceType_SequenceTypeInterface
+     */
+    public function getSequenceType()
+    {
+        return $this->getTable()->getSequenceType($this->sequence_type);
+    }
+
+    /**
+     * Get all item IDs in this corpus, valid and invalid.
+     *
+     * @return array
+     */
     public function getItems()
     {
         return json_decode($this->items, true);
+    }
+
+    /**
+     * Can a user validate items?
+     *
+     * @return bool
+     */
+    public function canValidateItems()
+    {
+        return (bool) $this->Items;
     }
 
     public function getRecordUrl($action = 'show')
@@ -30,20 +60,15 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         return array('controller' => 'ngram', 'action' => $action, 'id' => $this->id);
     }
 
-    public function canGenerateCorpusNgrams()
-    {
-        // all items in $this->items are in the item_ngrams table
-    }
-
     protected function _validate() {
-        $db = $this->getDb();
-        $name = trim($this->name);
-        if ('' === $name) {
+        if ('' === trim($this->name)) {
             $this->addError('name', 'A name is required');
         }
-        $elementId = $this->sequence_member_element_id;
-        if (!$db->getTable('Element')->exists($this->sequence_element_id)) {
-            $this->addError('Sequence Element', 'An element is required');
+        if (!$this->getTable('Element')->exists($this->sequence_element_id)) {
+            $this->addError('Sequence Element', 'Invalid sequence element');
+        }
+        if (!$this->SequenceType) {
+            $this->addError('Sequence Type', 'Invalid sequence type');
         }
     }
 }

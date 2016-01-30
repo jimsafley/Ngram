@@ -29,7 +29,7 @@ echo flash();
                 'sequence_element_id',
                 $corpus->sequence_element_id,
                 array('id' => 'sequence_element_id'),
-                $elementOptions
+                $sequenceElementOptions
             ); ?>
         </div>
     </div>
@@ -42,12 +42,7 @@ echo flash();
                 'sequence_type',
                 $corpus->sequence_type,
                 array('id' => 'sequence_type'),
-                array(
-                    '' => 'Select Below',
-                    'year' => 'Date by year',
-                    'month' => 'Date by month',
-                    'day' => 'Date by day',
-                )
+                $sequenceTypeOptions
             ); ?>
         </div>
     </div>

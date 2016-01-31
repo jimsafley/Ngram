@@ -9,8 +9,6 @@ echo flash();
     <a href="<?php echo html_escape(url('ngram/corpora/add')); ?>" class="small green button">Add a Corpus</a>
 </div>
 
-<p></p>
-
 <table>
 <thead>
     <tr>
@@ -49,7 +47,7 @@ $sequenceElementSetName = $sequenceElement->getElementSet()->name;
 
 <h2>You have no corpora.</h2>
 <p>Get started by adding your first corpus.</p>
-<a href="<?php echo html_escape(url('ngram/corpuses/add')); ?>" class="add big green button">Add a Corpus</a>
+<a href="<?php echo html_escape(url('ngram/corpora/add')); ?>" class="add big green button">Add a Corpus</a>
 <?php endif; ?>
 
 <?php echo foot(); ?>

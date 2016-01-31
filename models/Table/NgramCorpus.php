@@ -8,6 +8,7 @@ class Table_NgramCorpus extends Omeka_Db_Table
         'Ngram_SequenceType_Year',
         'Ngram_SequenceType_Month',
         'Ngram_SequenceType_Day',
+        'Ngram_SequenceType_Alphanumeric',
     );
 
     /**

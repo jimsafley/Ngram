@@ -8,6 +8,7 @@ $invalidCount = count($invalidItems);
 
 <h3>Invalid Items (<?php echo $invalidCount; ?>)</h3>
 
+<?php if ($invalidCount): ?>
 <table>
 <thead>
     <tr>
@@ -24,9 +25,13 @@ $invalidCount = count($invalidItems);
     <?php endforeach; ?>
 </tbody>
 </table>
+<?php else: ?>
+<p>There are no invalid items.</p>
+<?php endif; ?>
 
 <h3>Valid Items (<?php echo $validCount; ?>)</h3>
 
+<?php if ($validCount): ?>
 <table>
 <thead>
     <tr>
@@ -45,9 +50,11 @@ $invalidCount = count($invalidItems);
     <?php endforeach; ?>
 </tbody>
 </table>
-
 <form method="post" action="<?php echo html_escape(url('ngram/corpora/validate/' . $corpus->id)); ?>">
     <?php echo $this->formSubmit('accept_items', 'Accept Valid Items'); ?>
 </form>
+<?php else: ?>
+<p>There are no valid items.</p>
+<?php endif; ?>
 
 <?php echo foot(); ?>

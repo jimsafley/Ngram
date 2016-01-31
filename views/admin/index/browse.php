@@ -6,7 +6,7 @@ echo flash();
 <?php if ($total_results): ?>
 
 <div class="table-actions">
-    <a href="<?php echo html_escape(url('ngram/corpuses/add')); ?>" class="small green button">Add a Corpus</a>
+    <a href="<?php echo html_escape(url('ngram/corpora/add')); ?>" class="small green button">Add a Corpus</a>
 </div>
 
 <p></p>
@@ -37,10 +37,7 @@ $sequenceElementSetName = $sequenceElement->getElementSet()->name;
         <td><?php echo count($corpus->Items); ?></td>
         <td>
             <?php if ($corpus->canValidateItems()): ?>
-            <form method="post" action="<?php echo html_escape(url('ngram/corpuses/validate-items')); ?>">
-                <?php echo $this->formHidden('id', $corpus->id); ?>
-                <?php echo $this->formSubmit('validate_items', 'Validate Items'); ?>
-            </form>
+            <a href="<?php echo url('ngram/corpora/validate/' . $corpus->id); ?>" class="small green button">Validate Items</a>
             <?php endif; ?>
         </td>
     </tr>

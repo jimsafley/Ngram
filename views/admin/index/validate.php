@@ -46,8 +46,7 @@ $invalidCount = count($invalidItems);
 </tbody>
 </table>
 
-<form method="post" action="<?php echo html_escape(url('ngram/corpuses/validate-items')); ?>">
-    <?php echo $this->formHidden('id', $corpus->id); ?>
+<form method="post" action="<?php echo html_escape(url('ngram/corpora/validate/' . $corpus->id)); ?>">
     <?php echo $this->formSubmit('accept_items', 'Accept Valid Items'); ?>
 </form>
 

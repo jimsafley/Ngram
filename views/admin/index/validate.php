@@ -6,7 +6,9 @@ $invalidCount = count($invalidItems);
 
 <h2><?php echo $corpus->name; ?> (<?php echo $validCount + $invalidCount ?> total items)</h2>
 
-<h3>Invalid Items (<?php echo $invalidCount; ?>)</h3>
+<h3>Sequence Type: <?php echo $corpus->getSequenceTypeLabel(); ?></h4>
+
+<h4>Invalid Items (<?php echo $invalidCount; ?>)</h4>
 
 <?php if ($invalidCount): ?>
 <table>
@@ -17,10 +19,10 @@ $invalidCount = count($invalidItems);
     </tr>
 </thead>
 <tbody>
-    <?php foreach ($invalidItems as $item): ?>
+    <?php foreach ($invalidItems as $id => $sequenceText): ?>
     <tr>
-        <td><a href="<?php echo url(array('controller' => 'items', 'action' => 'edit', 'id' => $item['id']), 'id'); ?>"><?php echo $item['id']; ?></a></td>
-        <td><?php echo $item['sequence_text']; ?></td>
+        <td><a href="<?php echo url(array('controller' => 'items', 'action' => 'edit', 'id' => $id), 'id'); ?>"><?php echo $id; ?></a></td>
+        <td><?php echo $sequenceText; ?></td>
     </tr>
     <?php endforeach; ?>
 </tbody>
@@ -29,7 +31,7 @@ $invalidCount = count($invalidItems);
 <p>There are no invalid items.</p>
 <?php endif; ?>
 
-<h3>Valid Items (<?php echo $validCount; ?>)</h3>
+<h4>Valid Items (<?php echo $validCount; ?>)</h4>
 
 <?php if ($validCount): ?>
 <table>
@@ -41,11 +43,11 @@ $invalidCount = count($invalidItems);
     </tr>
 </thead>
 <tbody>
-    <?php foreach ($validItems as $item): ?>
+    <?php foreach ($validItems as $id => $item): ?>
     <tr>
-        <td><a href="<?php echo url(array('controller' => 'items', 'action' => 'edit', 'id' => $item['id']), 'id'); ?>"><?php echo $item['id']; ?></a></td>
-        <td><?php echo $item['sequence_text']; ?></td>
-        <td><kbd><?php echo $item['sequence_member']; ?></kbd></td>
+        <td><a href="<?php echo url(array('controller' => 'items', 'action' => 'edit', 'id' => $id), 'id'); ?>"><?php echo $id; ?></a></td>
+        <td><?php echo $item['text']; ?></td>
+        <td><kbd><?php echo $item['member']; ?></kbd></td>
     </tr>
     <?php endforeach; ?>
 </tbody>

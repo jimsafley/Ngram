@@ -30,7 +30,7 @@ $sequenceElementSetName = $sequenceElement->getElementSet()->name;
     <tr>
         <td><?php echo $corpus->name;?></td>
         <td><?php echo sprintf('%s<br>(%s)', $sequenceElementName, $sequenceElementSetName); ?></td>
-        <td><?php echo $corpus->SequenceType->getLabel(); ?></td>
+        <td><?php echo $corpus->getSequenceTypeLabel(); ?></td>
         <td><?php echo $corpus->sequence_range; ?></td>
         <td><?php echo count($corpus->Items); ?></td>
         <td>

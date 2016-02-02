@@ -2,38 +2,63 @@
 class Table_NgramCorpus extends Omeka_Db_Table
 {
     /**
-     * @var array Register of available sequence types.
+     * @var array Sequence type configuration.
      */
     protected $_sequenceTypes = array(
-        'Ngram_SequenceType_Year',
-        'Ngram_SequenceType_Month',
-        'Ngram_SequenceType_Day',
-        'Ngram_SequenceType_Alphanumeric',
+        'year' => array(
+            'label' => 'Date by year',
+            'validator' => 'Ngram_CorpusValidator_Year',
+        ),
+        'month' => array(
+            'label' => 'Date by month',
+            'validator' => 'Ngram_CorpusValidator_Month',
+        ),
+        'day' => array(
+            'label' => 'Date by day',
+            'validator' => 'Ngram_CorpusValidator_Day',
+        ),
+        'alpha' => array(
+            'label' => 'Alphabetical',
+            'validator' => 'Ngram_CorpusValidator_Alpha',
+        ),
+        'numeric' => array(
+            'label' => 'Numerical',
+            'validator' => 'Ngram_CorpusValidator_Numeric',
+        ),
     );
 
     /**
-     * Get a sequence type object by class name.
+     * Does this sequence type exist?
      *
-     * @param string $class
-     * @return Ngram_SequenceType_SequenceTypeInterface
+     * @param string $sequenceType
+     * @return bool
      */
-    public function getSequenceType($class)
+    public function sequenceTypeExists($sequenceType)
     {
-        return class_exists($class) ? new $class : null;
+        return (bool) isset($this->_sequenceTypes[$sequenceType]);
     }
 
     /**
-     * Get all sequence type objects, keyed by class name.
+     * Get the label for a sequence type.
      *
-     * @return array
+     * @param string $sequenceType
+     * @return string
      */
-    public function getSequenceTypes()
+    public function getSequenceTypeLabel($sequenceType)
     {
-        $types = array();
-        foreach ($this->_sequenceTypes as $class) {
-            $types[$class] = new $class;
-        }
-        return $types;
+        return $this->_sequenceTypes[$sequenceType]['label'];
+    }
+
+    /**
+     * Get a corpus validator by sequence type.
+     *
+     * @param string $sequenceType
+     * @return Ngram_CorpusValidator_CorpusValidatorInterface
+     */
+    public function getCorpusValidator($sequenceType)
+    {
+        $class = $this->_sequenceTypes[$sequenceType]['validator'];
+        return class_exists($class) ? new $class : null;
     }
 
     /**
@@ -44,8 +69,8 @@ class Table_NgramCorpus extends Omeka_Db_Table
     public function getSequenceTypesForSelect()
     {
         $options = array('' => 'Select Below');
-        foreach ($this->getSequenceTypes() as $sequenceType) {
-            $options[get_class($sequenceType)] = $sequenceType->getLabel();
+        foreach ($this->_sequenceTypes as $key => $value) {
+            $options[$key] = $value['label'];
         }
         return $options;
     }

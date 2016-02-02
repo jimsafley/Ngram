@@ -1,0 +1,34 @@
+<?php
+interface Ngram_CorpusValidator_CorpusValidatorInterface
+{
+    /**
+     * Add an item's sequence text.
+     *
+     * Implementations should validate the text and make valid items and invalid
+     * items available through the respective accessor methods.
+     *
+     * @param int $id The item ID
+     * @param string $text The item sequence text
+     */
+    public function addItem($id, $text);
+
+    /**
+     * Get valid items.
+     *
+     * Implementations should return an array of valid (and transformed if
+     * applicable) sequence members keyed by item ID.
+     *
+     * @return array
+     */
+    public function getValidItems();
+
+    /**
+     * Get invalid items.
+     *
+     * Implementations should return an array of item IDs that have invalid
+     * sequence text.
+     *
+     * @return array
+     */
+    public function getInvalidItems();
+}

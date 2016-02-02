@@ -11,7 +11,6 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
 
     protected $_related = array(
         'SequenceElement' => 'getSequenceElement',
-        'SequenceType' => 'getSequenceType',
         'Items' => 'getItems',
     );
 
@@ -26,13 +25,13 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
     }
 
     /**
-     * Get sequence type object.
+     * Get the sequence type label.
      *
-     * @return Ngram_SequenceType_SequenceTypeInterface
+     * @return string
      */
-    public function getSequenceType()
+    public function getSequenceTypeLabel()
     {
-        return $this->getTable()->getSequenceType($this->sequence_type);
+        return $this->getTable()->getSequenceTypeLabel($this->sequence_type);
     }
 
     /**
@@ -67,7 +66,7 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         if (!$this->getTable('Element')->exists($this->sequence_element_id)) {
             $this->addError('Sequence Element', 'Invalid sequence element');
         }
-        if (!$this->SequenceType) {
+        if (!$this->getTable()->sequenceTypeExists($this->sequence_type)) {
             $this->addError('Sequence Type', 'Invalid sequence type');
         }
     }

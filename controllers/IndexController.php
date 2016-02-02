@@ -68,24 +68,30 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         $db->ElementText,
         $db->quote(json_decode($corpus->items, true)),
         $db->quote($corpus->sequence_element_id));
-        $items = $db->fetchAll($sql);
+        $sequenceTexts = $db->fetchPairs($sql);
 
         // Validate the sequence text.
-        $sequenceType = $corpus->SequenceType;
-        $sequenceType->setItems($items);
-        $validItems = $sequenceType->getValidItems();
-        $invalidItems = $sequenceType->getInalidItems();
+        $validator = $table->getCorpusValidator($corpus->sequence_type);
+        foreach ($sequenceTexts as $id => $text) {
+            $validator->addItem($id, $text);
+        }
 
-        // Sort the valid and invalid item arrays.
-        usort($validItems, function($a, $b) {
-            if ($a['sequence_member'] === $b['sequence_member']) {
-                return 0;
-            }
-            return $a['sequence_member'] < $b['sequence_member'] ? -1 : 1;
-        });
-        usort($invalidItems, function($a, $b) {
-            return strcmp($a['sequence_text'], $b['sequence_text']);
-        });
+        // Prepare valid items.
+        $validItems = $validator->getValidItems();
+        natcasesort($validItems);
+        foreach ($validItems as $id => $sequenceMember) {
+            $validItems[$id] = array(
+                'member' => $sequenceMember,
+                'text' => $sequenceTexts[$id],
+            );
+        }
+
+        // Prepare invalid items.
+        $invalidItems = array();
+        foreach ($validator->getInvalidItems() as $id) {
+            $invalidItems[$id] = $sequenceTexts[$id];
+        }
+        natcasesort($invalidItems);
 
         $this->view->corpus = $corpus;
         $this->view->validItems = $validItems;

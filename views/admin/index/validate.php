@@ -27,6 +27,9 @@ jQuery(window).load(function () {
 <div id="valid-items">
 <h3>Valid Items (<?php echo $validCount; ?>)</h3>
 <?php if ($validCount): ?>
+<form method="post" action="<?php echo html_escape(url('ngram/corpora/validate/' . $corpus->id)); ?>">
+    <?php echo $this->formSubmit('accept_items', 'Accept Valid Items'); ?>
+</form>
 <table>
 <thead>
     <tr>
@@ -45,9 +48,6 @@ jQuery(window).load(function () {
     <?php endforeach; ?>
 </tbody>
 </table>
-<form method="post" action="<?php echo html_escape(url('ngram/corpora/validate/' . $corpus->id)); ?>">
-    <?php echo $this->formSubmit('accept_items', 'Accept Valid Items'); ?>
-</form>
 <?php else: ?>
 <p>There are no valid items.</p>
 <?php endif; ?>

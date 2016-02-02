@@ -76,7 +76,7 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         if ($request->isPost()) {
             $corpus->items_corpus = json_encode($validItems);
             $corpus->save(false);
-            $this->_helper->flashMessenger('The valid items were successfully accepted. This corpus is now locked. You may now generate ngrams.', 'success');
+            $this->_helper->flashMessenger('The valid items were successfully accepted.', 'success');
             $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
         }
 

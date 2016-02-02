@@ -4,10 +4,22 @@ class Ngram_CorpusValidator_Numeric extends Ngram_CorpusValidator_AbstractCorpus
     public function addItem($id, $text)
     {
         $text = trim($text);
-        if (is_numeric($text)) {
-            $this->_validItems[$id] = $text;
-        } else {
+        $member = $this->getSequenceMember($text);
+        if (false === $member) {
             $this->_invalidItems[] = $id;
+        } elseif ($this->isWithinRangeNumeric($member)) {
+            $this->_validItems[$id] = $member;
+        } else {
+            $this->_outOfRangeItems[$id] = $member;
+        }
+    }
+
+    protected function getSequenceMember($text)
+    {
+        if (is_numeric($text)) {
+            return $text;
+        } else {
+            return false;
         }
     }
 }

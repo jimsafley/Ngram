@@ -16,8 +16,6 @@ echo flash();
         <th>Sequence Element</th>
         <th>Sequence Type</th>
         <th>Sequence Range</th>
-        <th>Items</th>
-        <th></th>
     </tr>
 </thead>
 <tbody>
@@ -28,16 +26,10 @@ $sequenceElementName = $sequenceElement->name;
 $sequenceElementSetName = $sequenceElement->getElementSet()->name;
 ?>
     <tr>
-        <td><?php echo $corpus->name;?></td>
-        <td><?php echo sprintf('%s<br>(%s)', $sequenceElementName, $sequenceElementSetName); ?></td>
+        <td><?php echo link_to($corpus, 'show', $corpus->name);?></td>
+        <td><?php echo sprintf('%s (%s)', $sequenceElementName, $sequenceElementSetName); ?></td>
         <td><?php echo $corpus->getSequenceTypeLabel(); ?></td>
         <td><?php echo $corpus->sequence_range; ?></td>
-        <td><?php echo count($corpus->Items); ?></td>
-        <td>
-            <?php if ($corpus->canValidateItems()): ?>
-            <a href="<?php echo url('ngram/corpora/validate/' . $corpus->id); ?>" class="small green button">Validate Items</a>
-            <?php endif; ?>
-        </td>
     </tr>
 <?php endforeach; ?>
 </tbody>

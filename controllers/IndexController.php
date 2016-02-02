@@ -16,36 +16,26 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         $this->view->corpus = $this->view->ngram_corpu; // correct poor inflection
     }
 
-    /**
-     * Set items in corpus.
-     *
-     * @param Omeka_Record_AbstractRecord $corpus
-     */
-    protected function _redirectAfterAdd($corpus)
+    public function editAction()
     {
-        parse_str($corpus->query, $query);
-        // Items must be described by the corpus sequence element.
-        $query['advanced'][] = array(
-            'element_id' => $corpus->sequence_element_id,
-            'type' => 'is not empty',
-        );
-        // Items must be described by the corpus text element.
-        $query['advanced'][] = array(
-            'element_id' => get_option('ngram_text_element_id'),
-            'type' => 'is not empty',
-        );
+        parent::editAction();
 
         $table = $this->_helper->db;
-        $items = $table->getTable('Item')->findBy($query);
-        $itemIds = array();
-        foreach ($items as $item) {
-            $itemIds[] = $item->id;
-        }
+        $this->view->sequenceTypeOptions = $table->getTable()->getSequenceTypesForSelect();
+        $this->view->sequenceElementOptions = $table->getTable()->getElementsForSelect();
+        $this->view->corpus = $this->view->ngram_corpu; // correct poor inflection
+    }
 
-        $corpus->items = json_encode($itemIds);
-        $corpus->save(false);
+    public function showAction()
+    {
+        parent::showAction();
 
-        parent::_redirectAfterAdd($corpus);
+        $this->view->corpus = $this->view->ngram_corpu; // correct poor inflection
+    }
+
+    protected function _redirectAfterEdit($corpus)
+    {
+        $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
     }
 
     public function validateAction()
@@ -66,7 +56,7 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         GROUP BY i.id',
         $db->Item,
         $db->ElementText,
-        $db->quote(json_decode($corpus->items, true)),
+        $db->quote(json_decode($corpus->items_pool, true)),
         $db->quote($corpus->sequence_element_id));
         $sequenceTexts = $db->fetchPairs($sql);
 
@@ -116,5 +106,10 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
     protected function _getAddSuccessMessage($record)
     {
         return sprintf('The "%s" corpus was sucessfully added.', $record->name);
+    }
+
+    protected function _getEditSuccessMessage($record)
+    {
+        return sprintf('The "%s" corpus was sucessfully edited.', $record->name);;
     }
 }

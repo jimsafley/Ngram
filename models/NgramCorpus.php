@@ -7,11 +7,13 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
     public $sequence_element_id;
     public $sequence_type;
     public $sequence_range;
-    public $items;
+    public $items_pool;
+    public $items_corpus;
 
     protected $_related = array(
         'SequenceElement' => 'getSequenceElement',
-        'Items' => 'getItems',
+        'ItemsPool' => 'getItemsPool',
+        'ItemsCorpus' => 'getItemsCorpus',
     );
 
     /**
@@ -35,13 +37,38 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
     }
 
     /**
-     * Get all item IDs in this corpus, valid and invalid.
+     * Get an array of item IDs in the items pool.
+     *
+     * The items pool is the pool of items available to the corpus, following
+     * the query and the existence of a text and sequence value.
      *
      * @return array
      */
-    public function getItems()
+    public function getItemsPool()
     {
-        return json_decode($this->items, true);
+        return json_decode($this->items_pool, true);
+    }
+
+    /**
+     * Get all item IDs and sequence members in this corpus.
+     *
+     * @return array
+     */
+    public function getItemsCorpus()
+    {
+        return json_decode($this->items_corpus, true);
+    }
+
+    /**
+     * Can a user edit this corpus?
+     *
+     * A user cannot edit a corpus if the items have been validated.
+     *
+     * @return bool
+     */
+    public function canEdit()
+    {
+        return (bool) !$this->ItemsCorpus;
     }
 
     /**
@@ -49,14 +76,14 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
      *
      * @return bool
      */
-    public function canValidateItems()
+    public function canValidate()
     {
-        return (bool) $this->Items;
+        return (bool) $this->ItemsPool && !$this->ItemsCorpus;
     }
 
     public function getRecordUrl($action = 'show')
     {
-        return array('controller' => 'ngram', 'action' => $action, 'id' => $this->id);
+        return url(array('action' => $action, 'id' => $this->id), 'ngramId');
     }
 
     protected function _validate() {
@@ -69,5 +96,26 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         if (!$this->getTable()->sequenceTypeExists($this->sequence_type)) {
             $this->addError('Sequence Type', 'Invalid sequence type');
         }
+    }
+
+    protected function beforeSave($args)
+    {
+        parse_str($corpus->query, $query);
+        // Items must be described by the corpus sequence element.
+        $query['advanced'][] = array(
+            'element_id' => $this->sequence_element_id,
+            'type' => 'is not empty',
+        );
+        // Items must be described by the corpus text element.
+        $query['advanced'][] = array(
+            'element_id' => get_option('ngram_text_element_id'),
+            'type' => 'is not empty',
+        );
+        $items = $this->getTable('Item')->findBy($query);
+        $itemIds = array();
+        foreach ($items as $item) {
+            $itemIds[] = $item->id;
+        }
+        $this->items_pool = json_encode($itemIds);
     }
 }

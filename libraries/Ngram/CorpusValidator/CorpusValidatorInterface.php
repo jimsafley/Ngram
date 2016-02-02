@@ -13,6 +13,14 @@ interface Ngram_CorpusValidator_CorpusValidatorInterface
     public function addItem($id, $text);
 
     /**
+     * Set the sequence range.
+     *
+     * @param mixed $from
+     * @param mixed $to
+     */
+    public function setRange($from, $to);
+
+    /**
      * Get valid items.
      *
      * Implementations should return an array of valid (and transformed if
@@ -31,4 +39,6 @@ interface Ngram_CorpusValidator_CorpusValidatorInterface
      * @return array
      */
     public function getInvalidItems();
+
+    public function getOutOfRangeItems();
 }

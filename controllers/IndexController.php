@@ -70,8 +70,12 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         $db->quote($corpus->sequence_element_id));
         $sequenceTexts = $db->fetchPairs($sql);
 
-        // Validate the sequence text.
+        // Set the range and validate the sequence text.
         $validator = $table->getCorpusValidator($corpus->sequence_type);
+        if ($corpus->sequence_range) {
+            $range = explode('-', $corpus->sequence_range);
+            $validator->setRange($range[0], $range[1]);
+        }
         foreach ($sequenceTexts as $id => $text) {
             $validator->addItem($id, $text);
         }
@@ -81,6 +85,16 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         natcasesort($validItems);
         foreach ($validItems as $id => $sequenceMember) {
             $validItems[$id] = array(
+                'member' => $sequenceMember,
+                'text' => $sequenceTexts[$id],
+            );
+        }
+
+        // Prepare out of range items.
+        $outOfRangeItems = $validator->getOutOfRangeItems();
+        natcasesort($outOfRangeItems);
+        foreach ($outOfRangeItems as $id => $sequenceMember) {
+            $outOfRangeItems[$id] = array(
                 'member' => $sequenceMember,
                 'text' => $sequenceTexts[$id],
             );
@@ -96,6 +110,7 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         $this->view->corpus = $corpus;
         $this->view->validItems = $validItems;
         $this->view->invalidItems = $invalidItems;
+        $this->view->outOfRangeItems = $outOfRangeItems;
     }
 
     protected function _getAddSuccessMessage($record)

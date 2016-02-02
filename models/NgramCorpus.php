@@ -76,9 +76,19 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
      *
      * @return bool
      */
-    public function canValidate()
+    public function canValidateItems()
     {
         return (bool) $this->ItemsPool && !$this->ItemsCorpus;
+    }
+
+    /**
+     * Can a user generate ngrams?
+     *
+     * @return bool
+     */
+    public function canGenerateNgrams()
+    {
+        return (bool) $this->ItemsPool && $this->ItemsCorpus;
     }
 
     public function getRecordUrl($action = 'show')
@@ -100,6 +110,13 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
 
     protected function beforeSave($args)
     {
+        // There's no need to retrieve and set the item pool if the corpus
+        // items are set.
+        if ($this->items_corpus) {
+            return;
+        }
+
+        // Retrieve and set the item pool.
         parse_str($corpus->query, $query);
         // Items must be described by the corpus sequence element.
         $query['advanced'][] = array(

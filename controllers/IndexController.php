@@ -70,8 +70,17 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
             $validator->addItem($id, $text);
         }
 
-        // Prepare valid items.
         $validItems = $validator->getValidItems();
+
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $corpus->items_corpus = json_encode($validItems);
+            $corpus->save(false);
+            $this->_helper->flashMessenger('The valid items were successfully accepted. This corpus is now locked. You may now generate ngrams.', 'success');
+            $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
+        }
+
+        // Prepare valid items.
         natcasesort($validItems);
         foreach ($validItems as $id => $sequenceMember) {
             $validItems[$id] = array(

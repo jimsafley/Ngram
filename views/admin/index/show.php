@@ -21,12 +21,19 @@ $sequenceElementSetName = $sequenceElement->getElementSet()->name;
 </section>
 
 <section class="three columns omega">
-    <div class="panel">
+    <div id="save" class="panel">
         <?php if ($corpus->canEdit()): ?>
         <a href="<?php echo $corpus->getRecordUrl('edit'); ?>" class="big green button">Edit</a>
+        <?php else: ?>
+        <p class="error">This corpus is locked: the items were validated and accepted; no further edits are allowed.</p>
         <?php endif; ?>
-        <?php if ($corpus->canValidate()): ?>
+        <?php if ($corpus->canValidateItems()): ?>
         <a href="<?php echo $corpus->getRecordUrl('validate');; ?>" class="big green button">Validate Items</a>
+        <?php endif; ?>
+        <?php if ($corpus->canGenerateNgrams()): ?>
+        <form method="post">
+            <?php echo $this->formSubmit('generate_ngrams', 'Generate Ngrams', array('class' => 'big green button')) ?>
+        </form>
         <?php endif; ?>
     </div>
 </section>

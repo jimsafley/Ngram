@@ -4,19 +4,32 @@ class Ngram_CorpusValidator_Day extends Ngram_CorpusValidator_CorpusValidatorTyp
     public function addItem($id, $text)
     {
         $text = trim($text);
+        $member = $this->getSequenceMember($text);
+        if (false === $member) {
+            $this->_invalidItems[] = $id;
+        } elseif ($this->isWithinRangeNumeric($member)) {
+            $this->_validItems[$id] = $member;
+        } else {
+            $this->_outOfRangeItems[$id] = $member;
+        }
+    }
+
+    protected function getSequenceMember($text)
+    {
         if (preg_match('/^\d{4}$/', $text)) {
-            $this->invalidItems[] = $id;
+            return false;
         } elseif (preg_match('/^[a-z]+ \d+$/i', $text)) {
-            $this->_invalidItems[] = $id;
+            return false;
         } elseif (preg_match('/^\d+-\d+$/i', $text)) {
-            $this->_invalidItems[] = $id;
+            return false;
         } else {
             $timestamp = strtotime($text);
             if ($timestamp) {
-                $this->_validItems[$id] = date('Ym', $timestamp);
+                return date('Ym', $timestamp);
             } else {
-                $this->_invalidItems[] = $id;
+                return false;
             }
         }
+
     }
 }

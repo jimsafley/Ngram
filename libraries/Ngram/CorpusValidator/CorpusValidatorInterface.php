@@ -40,5 +40,13 @@ interface Ngram_CorpusValidator_CorpusValidatorInterface
      */
     public function getInvalidItems();
 
+    /**
+     * Get out-of-range items.
+     *
+     * Implementations should return an array of out-of-range (but otherwise
+     * valid and transformed if applicable) sequence members keyed by item ID.
+     *
+     * @return array
+     */
     public function getOutOfRangeItems();
 }

@@ -17,7 +17,7 @@ jQuery(window).load(function () {
     <li><a href="#out-of-range-items">Out of Range Items</a></li>
 </ul>
 
-<h2><?php echo $corpus->name; ?> (<?php echo count($corpus->Items); ?> total items)</h2>
+<h2><?php echo $corpus->name; ?> (<?php echo count($corpus->ItemsPool); ?> total items)</h2>
 
 <ul>
     <li>Sequence Type: <?php echo $corpus->getSequenceTypeLabel(); ?></li>

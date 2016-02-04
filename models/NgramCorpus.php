@@ -117,7 +117,7 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
         }
 
         // Retrieve and set the item pool.
-        parse_str($corpus->query, $query);
+        parse_str($this->query, $query);
         // Items must be described by the corpus sequence element.
         $query['advanced'][] = array(
             'element_id' => $this->sequence_element_id,

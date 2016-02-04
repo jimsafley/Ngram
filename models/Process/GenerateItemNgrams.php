@@ -1,6 +1,12 @@
 <?php
 class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
 {
+    /**
+     * An array containing item IDs for every instance of the ngram. Note that
+     * an item may have more than one instance of the same ngram.
+     *
+     * @var array
+     */
     protected $_corpusNgrams = array();
 
     public function run($args)
@@ -9,6 +15,10 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
         $corpus = $db->getTable('NgramCorpus')->find($args['corpus_id']);
         $textElementId = get_option('ngram_text_element_id');
         $n = $args['n'];
+
+        /**
+         * First derive and store the discrete ngrams and item ngrams.
+         */
 
         $selectItemSql = sprintf('
         SELECT ng.id
@@ -74,6 +84,10 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
             throw $e;
         }
 
+        /**
+         * Now, calculate and store the corpus ngrams.
+         */
+
         $corpusNgramsSql = sprintf('
         INSERT IGNORE INTO %s (
             corpus_id, ngram_id, sequence_member, match_count, item_count, relative_frequency
@@ -117,7 +131,10 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
             throw $e;
         }
 
-        var_dump(memory_get_peak_usage());
+        _log(sprintf(
+            'Peak usage for corpus #%s (n=%s): %s',
+            $corpus->id, $n, memory_get_peak_usage()
+        ));
     }
 
     protected function _addCorpusNgram($itemId, $ngramId, $sequenceMember)

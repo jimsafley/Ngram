@@ -1,6 +1,8 @@
 <?php
 class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
 {
+    protected $_corpusNgrams = array();
+
     public function run($args)
     {
         $db = get_db();
@@ -9,13 +11,12 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
         $n = $args['n'];
 
         $selectItemSql = sprintf('
-        SELECT 1
+        SELECT ng.id
         FROM %s ing
         JOIN %s ng
         ON ing.ngram_id = ng.id
         WHERE ing.item_id = ? 
-        AND ng.n = %s
-        GROUP BY ing.item_id',
+        AND ng.n = %s',
         $db->NgramItemNgram,
         $db->NgramNgram,
         $db->quote($n, Zend_Db::INT_TYPE));
@@ -46,8 +47,12 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
             foreach ($corpus->ItemsCorpus as $itemId => $sequenceMember) {
 
                 // Do not re-generate item ngrams for the current n.
-                $stmt = $db->query($selectItemSql, $itemId);
-                if ($stmt->fetchColumn(0)) {
+                $ngramIds = $db->query($selectItemSql, $itemId)
+                    ->fetchAll(Zend_Db::FETCH_COLUMN, 0);
+                if ($ngramIds) {
+                    foreach ($ngramIds as $ngramId) {
+                        $this->_addCorpusNgram($itemId, $ngramId, $sequenceMember);
+                    }
                     continue;
                 }
 
@@ -58,7 +63,9 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
                 // Iterate item ngrams.
                 foreach ($text->getNgrams($n) as $ngram) {
                     $db->query($ngramsSql, array($ngram, $n));
-                    $db->query($itemNgramsSql, array($db->lastInsertId(), $itemId));
+                    $ngramId = $db->lastInsertId();
+                    $db->query($itemNgramsSql, array($ngramId, $itemId));
+                    $this->_addCorpusNgram($itemId, $ngramId, $sequenceMember);
                 }
             }
             $db->commit();
@@ -66,5 +73,45 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
             $db->rollBack();
             throw $e;
         }
+
+        $corpusSequenceMembers = [];
+        foreach ($this->_corpusNgrams as $ngramId => $sequenceMembers) {
+            foreach ($sequenceMembers as $sequenceMember => $itemIds) {
+                if (!isset($corpusSequenceMembers[$sequenceMember])) {
+                    $corpusSequenceMembers[$sequenceMember] = [];
+                }
+                // This is the match count, i.e. the number of instances of the
+                // ngram for the specified sequence member.
+                $corpusSequenceMembers[$sequenceMember][$ngramId] = count($itemIds);
+            }
+        }
+
+        foreach ($corpusSequenceMembers as $sequenceMember => $ngramIds) {
+            // This is the total number of ngrams for the sequence member.
+            $totalCount = array_sum($ngramIds);
+            foreach ($ngramIds as $ngramId => $matchCount) {
+                $items = $this->_corpusNgrams[$ngramId][$sequenceMember];
+                $corpusSequenceMembers[$sequenceMember][$ngramId] = [
+                    'match_count' => $matchCount,
+                    'item_count' => count(array_unique($items)),
+                    'rel_freq' => $matchCount / $totalCount,
+                    'items' => $items,
+                ];
+            }
+        }
+
+        print_r($corpusSequenceMembers);
+        var_dump(memory_get_peak_usage());
+    }
+
+    protected function _addCorpusNgram($itemId, $ngramId, $sequenceMember)
+    {
+        if (!isset($this->_corpusNgrams[$ngramId])) {
+            $this->_corpusNgrams[$ngramId] = [];
+        }
+        if (!isset($this->_corpusNgrams[$ngramId][$sequenceMember])) {
+            $this->_corpusNgrams[$ngramId][$sequenceMember] = [];
+        }
+        $this->_corpusNgrams[$ngramId][$sequenceMember][] = $itemId;
     }
 }

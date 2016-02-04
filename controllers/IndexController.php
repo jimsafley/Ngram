@@ -30,18 +30,24 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
     {
         parent::showAction();
 
-        $corpus = $this->view->ngram_corpu; // correct poor inflection
+        $this->view->corpus = $this->view->ngram_corpu; // correct poor inflection
+    }
 
+    public function generateNgramsAction()
+    {
         $request = $this->getRequest();
         if ($request->isPost()) {
+            $corpus = $this->_helper->db->findById();
             Omeka_Job_Process_Dispatcher::startProcess(
-                'Process_GenerateNgrams',
-                null,
-                array('corpus_id' => $corpus->id)
+                'Process_GenerateItemNgrams', null, array(
+                    'corpus_id' => $corpus->id,
+                    'n' => $request->getPost('n'),
+                )
             );
+            $this->_helper->flashMessenger('The corpus ngrams are now being generated. This may take some time.', 'success');
+            $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
         }
-
-        $this->view->corpus = $corpus;
+        $this->_helper->redirector('browse');
     }
 
     protected function _redirectAfterEdit($corpus)

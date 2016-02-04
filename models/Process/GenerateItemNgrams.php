@@ -1,12 +1,12 @@
 <?php
-class Process_GenerateNgrams extends Omeka_Job_Process_AbstractProcess
+class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
 {
     public function run($args)
     {
         $db = get_db();
-        $n = 1;
         $corpus = $db->getTable('NgramCorpus')->find($args['corpus_id']);
         $textElementId = get_option('ngram_text_element_id');
+        $n = $args['n'];
 
         $selectItemSql = sprintf('
         SELECT 1
@@ -64,9 +64,7 @@ class Process_GenerateNgrams extends Omeka_Job_Process_AbstractProcess
             $db->commit();
         } catch (Exception $e) {
             $db->rollBack();
-            echo $e;
+            throw $e;
         }
-
-        var_dump(memory_get_peak_usage());
     }
 }

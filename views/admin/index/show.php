@@ -31,8 +31,13 @@ $sequenceElementSetName = $sequenceElement->getElementSet()->name;
         <a href="<?php echo $corpus->getRecordUrl('validate');; ?>" class="big green button">Validate Items</a>
         <?php endif; ?>
         <?php if ($corpus->canGenerateNgrams()): ?>
-        <form method="post">
-            <?php echo $this->formSubmit('generate_ngrams', 'Generate Ngrams', array('class' => 'big green button')) ?>
+        <form method="post" action="<?php echo url('ngram/corpora/generate-ngrams/' . $corpus->id); ?>">
+            <?php echo $this->formHidden('n', 1); ?>
+            <?php echo $this->formSubmit('generate_ngrams', 'Generate Unigrams', array('class' => 'big green button')) ?>
+        </form>
+        <form method="post" action="<?php echo url('ngram/corpora/generate-ngrams/' . $corpus->id); ?>">
+            <?php echo $this->formHidden('n', 2); ?>
+            <?php echo $this->formSubmit('generate_ngrams', 'Generate Bigrams', array('class' => 'big green button')) ?>
         </form>
         <?php endif; ?>
     </div>

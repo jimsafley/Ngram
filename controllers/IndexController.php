@@ -30,7 +30,18 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
     {
         parent::showAction();
 
-        $this->view->corpus = $this->view->ngram_corpu; // correct poor inflection
+        $corpus = $this->view->ngram_corpu; // correct poor inflection
+
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            Omeka_Job_Process_Dispatcher::startProcess(
+                'Process_GenerateNgrams',
+                null,
+                array('corpus_id' => $corpus->id)
+            );
+        }
+
+        $this->view->corpus = $corpus;
     }
 
     protected function _redirectAfterEdit($corpus)

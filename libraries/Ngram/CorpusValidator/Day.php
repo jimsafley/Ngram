@@ -1,5 +1,5 @@
 <?php
-class Ngram_CorpusValidator_Day extends Ngram_CorpusValidator_CorpusValidatorType
+class Ngram_CorpusValidator_Day extends Ngram_CorpusValidator_AbstractCorpusValidator
 {
     public function addItem($id, $text)
     {
@@ -25,7 +25,7 @@ class Ngram_CorpusValidator_Day extends Ngram_CorpusValidator_CorpusValidatorTyp
         } else {
             $timestamp = strtotime($text);
             if ($timestamp) {
-                return date('Ym', $timestamp);
+                return date('Ymd', $timestamp);
             } else {
                 return false;
             }

@@ -89,7 +89,7 @@ class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
          */
 
         $corpusNgramsSql = sprintf('
-        INSERT IGNORE INTO %s (
+        INSERT INTO %s (
             corpus_id, ngram_id, sequence_member, match_count, item_count, relative_frequency
         ) VALUES (
             %s, ?, ?, ?, ?, ?

@@ -1,5 +1,5 @@
 <?php
-class Process_GenerateItemNgrams extends Omeka_Job_Process_AbstractProcess
+class Process_GenerateNgrams extends Omeka_Job_Process_AbstractProcess
 {
     /**
      * @var array

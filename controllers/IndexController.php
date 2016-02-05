@@ -39,7 +39,7 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         if ($request->isPost()) {
             $corpus = $this->_helper->db->findById();
             Omeka_Job_Process_Dispatcher::startProcess(
-                'Process_GenerateItemNgrams', null, array(
+                'Process_GenerateNgrams', null, array(
                     'corpus_id' => $corpus->id,
                     'n' => $request->getPost('n'),
                 )

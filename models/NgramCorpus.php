@@ -88,7 +88,7 @@ class NgramCorpus extends Omeka_Record_AbstractRecord
      */
     public function canGenerateNgrams()
     {
-        return (bool) $this->ItemsPool && $this->ItemsCorpus;
+        return (bool) $this->ItemsCorpus;
     }
 
     public function getRecordUrl($action = 'show')

@@ -50,16 +50,6 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         $this->_helper->redirector('browse');
     }
 
-    protected function _redirectAfterAdd($corpus)
-    {
-        $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
-    }
-
-    protected function _redirectAfterEdit($corpus)
-    {
-        $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
-    }
-
     public function validateAction()
     {
         $table = $this->_helper->db;
@@ -132,6 +122,16 @@ class Ngram_IndexController extends Omeka_Controller_AbstractActionController
         $this->view->validItems = $validItems;
         $this->view->invalidItems = $invalidItems;
         $this->view->outOfRangeItems = $outOfRangeItems;
+    }
+
+    protected function _redirectAfterAdd($corpus)
+    {
+        $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
+    }
+
+    protected function _redirectAfterEdit($corpus)
+    {
+        $this->_helper->redirector->gotoRoute(array('action' => 'show', 'id' => $corpus->id), 'ngramId');
     }
 
     protected function _getAddSuccessMessage($record)
